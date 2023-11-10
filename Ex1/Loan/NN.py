@@ -4,6 +4,7 @@ from sklearn.model_selection import train_test_split  # Import train_test_split 
 from sklearn.preprocessing import StandardScaler, OneHotEncoder
 from sklearn.pipeline import Pipeline
 from sklearn.compose import ColumnTransformer
+from sklearn.neural_network import MLPClassifier
 
 
 def classify():
@@ -44,6 +45,7 @@ def classify():
     ])
     categorical_features = x.select_dtypes(include=['object']).columns
 
+    # --- This is just to check whether the encoding worked
     encoded_check = ColumnTransformer(
         transformers=[
             ('cat', categorical_transformer, categorical_features)
@@ -51,10 +53,38 @@ def classify():
     )
     encoded_columns = encoded_check.fit_transform(x)
     sample_encoded = encoded_columns[0:5]
+    # --- End of check
 
-    test = 1
+    x_train, x_test, y_train, y_test = train_test_split(x, y, test_size=0.3, random_state=1)  # 70% train, 30% test
 
-    # TODO: Resume at "The final part is separating the ..."
+    # Make a transformer that does the preprocessing
+    preprocessor = ColumnTransformer(
+        transformers=[
+            ('num', numeric_transformer, numeric_features),
+            ('cat', categorical_transformer, categorical_features)
+        ]
+    )
+
+    start = time.time()
+    # train the MLP classifier
+    mlp = MLPClassifier(hidden_layer_sizes=(10, 10, 10),
+                        max_iter=100,
+                        activation='tanh',
+                        solver='adam')
+
+    pipe = Pipeline(steps=[
+        ('pre', preprocessor),
+        ('mlpc', mlp)
+    ])
+
+    pipe.fit(x_train, y_train)
+    end = time.time()
+    elapsed_time = end - start
+
+    # test the MLP
+    accuracy = pipe.score(x_test, y_test)
+    print("Accuracy: " + str(accuracy))
+    print("Time: " + str(elapsed_time))
 
 
 if __name__ == '__main__':
