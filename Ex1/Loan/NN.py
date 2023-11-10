@@ -5,11 +5,20 @@ from sklearn.preprocessing import StandardScaler, OneHotEncoder
 from sklearn.pipeline import Pipeline
 from sklearn.compose import ColumnTransformer
 from sklearn.neural_network import MLPClassifier
+from sklearn.metrics import (
+    accuracy_score,
+    confusion_matrix,
+    ConfusionMatrixDisplay,
+    f1_score,
+)  # Import scikit-learn metrics module for accuracy calculation
 
 
 def classify():
     # load train data
     loan_lrn = pd.read_csv("../../datasets/Loan/loan-10k.lrn.csv", engine='python')
+
+    # data exploration
+    loan_lrn.info()
 
     # preprocessing
     features = loan_lrn.columns.to_list()
@@ -68,7 +77,7 @@ def classify():
     start = time.time()
     # train the MLP classifier
     mlp = MLPClassifier(hidden_layer_sizes=(10, 10, 10),
-                        max_iter=100,
+                        max_iter=300,
                         activation='tanh',
                         solver='adam')
 
@@ -82,9 +91,17 @@ def classify():
     elapsed_time = end - start
 
     # test the MLP
-    accuracy = pipe.score(x_test, y_test)
-    print("Accuracy: " + str(accuracy))
+    y_pred = pipe.predict(x_test)
+    accuracy = accuracy_score(y_test, y_pred)   # compute the accuracy
+    f1 = f1_score(y_pred, y_test, average="weighted")
+    print("\nAccuracy: " + str(accuracy))
     print("Time: " + str(elapsed_time))
+    print("F1 Score: ", f1)
+
+    # plot the confusion matrix
+    cm = confusion_matrix(y_test, y_pred)
+    disp = ConfusionMatrixDisplay(confusion_matrix=cm)
+    disp.plot().figure_.savefig('NN-MLP_confusion_matrix.png')
 
 
 if __name__ == '__main__':

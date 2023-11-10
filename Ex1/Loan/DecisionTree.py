@@ -4,7 +4,12 @@ import time
 import pandas as pd
 from sklearn.tree import DecisionTreeClassifier  # Import Decision Tree Classifier
 from sklearn.model_selection import train_test_split  # Import train_test_split function
-from sklearn import metrics  # Import scikit-learn metrics module for accuracy calculation
+from sklearn.metrics import (
+    accuracy_score,
+    confusion_matrix,
+    ConfusionMatrixDisplay,
+    f1_score,
+)  # Import scikit-learn metrics module for accuracy calculation
 from sklearn.tree import export_graphviz
 from six import StringIO
 from IPython.display import Image
@@ -15,6 +20,9 @@ import pydotplus
 def classify():
     # load train data
     loan_lrn = pd.read_csv("../../datasets/Loan/loan-10k.lrn.csv", engine='python')
+
+    # data exploration
+    loan_lrn.info()
 
     # preprocessing
     features = loan_lrn.columns.to_list()
@@ -30,7 +38,7 @@ def classify():
 
     # Create Decision Tree classifier Object
     # criterion: "gini" (gini index), "log_loss", "entropy" (information gain)
-    clf = DecisionTreeClassifier(criterion="log_loss", max_depth=2)
+    clf = DecisionTreeClassifier(criterion="log_loss", max_depth=None)
 
     start = time.time()
     # Train Decision Tree Classifier
@@ -43,10 +51,18 @@ def classify():
     y_pred = clf.predict(x_test)
 
     # Model Accuracy, how often is the classifier correct?
-    accuracy = metrics.accuracy_score(y_test, y_pred)
-    print("Accuracy: " + str(accuracy))
-    print("Time: " + str(elapsed_time))
+    accuracy = accuracy_score(y_test, y_pred)
+    f1 = f1_score(y_pred, y_test, average="weighted")
+    print("\nAccuracy: ", accuracy)
+    print("Time: ", elapsed_time)
+    print("F1 Score: ", f1)
 
+    # plot the confusion matrix
+    cm = confusion_matrix(y_test, y_pred)
+    disp = ConfusionMatrixDisplay(confusion_matrix=cm)
+    disp.plot().figure_.savefig('DT_confusion_matrix.png')
+
+    # Visualize the decision tree
     dot_data = StringIO()
     export_graphviz(clf, out_file=dot_data, filled=True, rounded=True,
                     special_characters=True, feature_names=features, class_names=['A', 'B', 'C', 'D', 'E', 'F', 'G'])
