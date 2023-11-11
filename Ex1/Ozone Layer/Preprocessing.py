@@ -1,18 +1,18 @@
 import pandas as pd
 import numpy as np
 
-# Get column names from onehr.names in order to name columns respectively.
+# Get column names from onehr.names
 names = pd.read_csv("onehr.names",
                     names=['name'])
 names['name'] = names['name'].str.split(':').str[0]
 list_of_names = names['name'].tolist()
 
 # Load Data
-df = pd.read_csv('onehr.data',
+df = pd.read_csv('../../datasets/onehr.data',
                  names=list_of_names,
                  parse_dates=['Date'])
 
-# Recognized some missing values in terms of '?'. Analyse the frequency of '?' to decide how to deal with it.
+# Recognized some missing values shown as '?'. Analyse frequency of '?' to decide how to deal with it.
 missing_values_df = pd.DataFrame(columns=['Column_Name', 'Missing_inTotal', 'Missing_in%'])
 length = len(df)
 df_str = df.astype(str)
