@@ -3,5 +3,7 @@ from sklearn.tree import DecisionTreeClassifier
 from sklearn.model_selection import train_test_split
 from sklearn import metrics
 
-df = pd.read_pickle('data_preprocessed.pkl')
+df = pd.read_pickle('../../datasets/Ozone/data_preprocessed.pkl')
+
+print(df.head())
 

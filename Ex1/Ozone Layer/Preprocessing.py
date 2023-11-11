@@ -2,13 +2,15 @@ import pandas as pd
 import numpy as np
 
 # Get column names from onehr.names
-names = pd.read_csv('../datasets/Ozone/onehr.names',
+names = pd.read_csv('../../datasets/Ozone/edited_onehr.names',
+                    engine='python',
                     names=['name'])
 names['name'] = names['name'].str.split(':').str[0]
 list_of_names = names['name'].tolist()
 
 # Load Data
-df = pd.read_csv('../datasets/Ozone/onehr.data',
+df = pd.read_csv('../../datasets/Ozone/onehr.data',
+                 engine='python',
                  names=list_of_names,
                  parse_dates=['Date'])
 
@@ -39,4 +41,4 @@ df['Class'] = df['Class'].astype(bool)
 assert ((df == '?').sum().sum() == 0)
 assert (df.isna().sum().sum() == 0)
 
-df.to_pickle('data_preprocessed.pkl')
+df.to_pickle('../../datasets/Ozone/data_preprocessed.pkl')
