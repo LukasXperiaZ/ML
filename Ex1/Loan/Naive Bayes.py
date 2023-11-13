@@ -32,7 +32,7 @@ def classify():
     x_train, x_test, y_train, y_test = train_test_split(x, y, test_size=0.3, random_state=1)  # 70% train, 30% test
 
     # Create Naive Bayes classifier
-    model = GaussianNB()
+    model = GaussianNB(var_smoothing=1e-12)
 
     start = time.time()
 
