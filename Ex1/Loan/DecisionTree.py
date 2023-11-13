@@ -68,7 +68,7 @@ def classify():
                     special_characters=True, feature_names=features, class_names=['A', 'B', 'C', 'D', 'E', 'F', 'G'])
     graph = pydotplus.graph_from_dot_data(dot_data.getvalue())
     if graph is not None:
-        graph.write_png('./plots/loan.png')
+        graph.write_png('./plots/loan_tree.png')
         Image(graph.create_png())
 
 
