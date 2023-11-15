@@ -1,7 +1,7 @@
 import time
 import pandas as pd
 from sklearn.naive_bayes import GaussianNB
-from sklearn.model_selection import train_test_split
+from sklearn.model_selection import train_test_split, cross_val_score
 from sklearn import metrics
 
 df = pd.read_pickle('../../datasets/Ozone/data_preprocessed.pkl')
@@ -32,3 +32,13 @@ print(metrics.classification_report(y_test, pred_test))
 cm = metrics.confusion_matrix(y_test, pred_test)
 disp = metrics.ConfusionMatrixDisplay(confusion_matrix=cm)
 disp.plot().figure_.savefig('Confusion_matrix_Ozone_NB.png')
+
+# Cross Validation
+start = time.time()
+scores = cross_val_score(model, X, y, cv=5)
+end = time.time()
+elapsed_time = end - start
+print("Cross validation yielded %0.2f accuracy with a standard deviation of %0.2f in time %0.2f s" % (
+    scores.mean(),
+    scores.std(),
+    elapsed_time))
