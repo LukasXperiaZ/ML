@@ -2,7 +2,7 @@ import time
 import pandas as pd
 import numpy as np
 from sklearn.preprocessing import LabelEncoder
-from sklearn.model_selection import train_test_split  # Import train_test_split function
+from sklearn.model_selection import train_test_split, cross_val_score  # Import train_test_split function
 from sklearn.naive_bayes import GaussianNB, MultinomialNB, CategoricalNB
 from sklearn.metrics import (
     accuracy_score,
@@ -32,17 +32,17 @@ def classify():
     x_train, x_test, y_train, y_test = train_test_split(x, y, test_size=0.3, random_state=1)  # 70% train, 30% test
 
     # Create Naive Bayes classifier
-    model = GaussianNB(var_smoothing=1e-12)
+    clf = GaussianNB(var_smoothing=1e-12)
 
     start = time.time()
 
     # Train the model
-    model.fit(x_train, y_train)
+    clf.fit(x_train, y_train)
 
     end = time.time()
     elapsed_time = end - start
 
-    y_pred = model.predict(x_test)
+    y_pred = clf.predict(x_test)
 
     # Model accuracy
     accuracy = accuracy_score(y_pred, y_test)
@@ -56,6 +56,16 @@ def classify():
     cm = confusion_matrix(y_test, y_pred)
     disp = ConfusionMatrixDisplay(confusion_matrix=cm)
     disp.plot().figure_.savefig('NB_confusion_matrix.png')
+
+    # Cross validation scores
+    start = time.time()
+    scores = cross_val_score(clf, x, y, cv=5)
+    end = time.time()
+    elapsed_time = end - start
+    print("Cross validation yielded %0.2f accuracy with a standard deviation of %0.2f in time %0.2f s" % (
+        scores.mean(),
+        scores.std(),
+        elapsed_time))
 
 
 if __name__ == '__main__':

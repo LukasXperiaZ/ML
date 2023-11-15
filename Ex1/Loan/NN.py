@@ -1,6 +1,6 @@
 import time
 import pandas as pd
-from sklearn.model_selection import train_test_split  # Import train_test_split function
+from sklearn.model_selection import train_test_split, cross_val_score  # Import train_test_split function
 from sklearn.preprocessing import StandardScaler, OneHotEncoder
 from sklearn.pipeline import Pipeline
 from sklearn.compose import ColumnTransformer
@@ -102,6 +102,16 @@ def classify():
     cm = confusion_matrix(y_test, y_pred)
     disp = ConfusionMatrixDisplay(confusion_matrix=cm)
     disp.plot().figure_.savefig('NN-MLP_confusion_matrix.png')
+
+    # Cross validation scores
+    start = time.time()
+    scores = cross_val_score(pipe, x, y, cv=5)
+    end = time.time()
+    elapsed_time = end - start
+    print("Cross validation yielded %0.2f accuracy with a standard deviation of %0.2f in time %0.2f s" % (
+        scores.mean(),
+        scores.std(),
+        elapsed_time))
 
 
 if __name__ == '__main__':

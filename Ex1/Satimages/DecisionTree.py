@@ -4,7 +4,7 @@ import time
 from scipy.io import arff
 import pandas as pd
 from sklearn.tree import DecisionTreeClassifier  # Import Decision Tree Classifier
-from sklearn.model_selection import train_test_split  # Import train_test_split function
+from sklearn.model_selection import train_test_split, cross_val_score  # Import train_test_split function
 from sklearn.metrics import (
     accuracy_score,
     confusion_matrix,
@@ -39,7 +39,7 @@ def classify():
 
     # Create Decision Tree classifier Object
     # criterion: "gini" (gini index), "log_loss", "entropy" (information gain)
-    clf = DecisionTreeClassifier(criterion="log_loss", max_depth=None)
+    clf = DecisionTreeClassifier(criterion="log_loss", max_depth=4)
 
     start = time.time()
     # Train Decision Tree Classifier
@@ -71,6 +71,15 @@ def classify():
     if graph is not None:
         graph.write_png('./plots/satimage_tree.png')
         Image(graph.create_png())
+
+    # Cross validation scores
+    start = time.time()
+    scores = cross_val_score(clf, x, y, cv=5)
+    end = time.time()
+    elapsed_time = end - start
+    print("Cross validation yielded %0.2f accuracy with a standard deviation of %0.2f in time %0.2f s" % (scores.mean(),
+                                                                                                        scores.std(),
+                                                                                                        elapsed_time))
 
 
 if __name__ == '__main__':
