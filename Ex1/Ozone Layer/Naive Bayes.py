@@ -13,7 +13,7 @@ y = df.Class
 X_train, X_test, y_train, y_test = train_test_split(X, y, test_size=0.3, random_state=1)
 
 # Create Naive Bayes classifier object
-model = GaussianNB()
+model = GaussianNB(priors=[0.995,0.005])
 
 start = time.time()
 # Train Naive Bayes Classifier
@@ -27,7 +27,6 @@ pred_test = model.predict(X_test)
 
 # Model Accuracy, how often is the classifier correct?
 print(f"Duration: {round(duration,2)}s")
-print(metrics.classification_report(y_train, pred_train))
 print(metrics.classification_report(y_test, pred_test))
 cm = metrics.confusion_matrix(y_test, pred_test)
 disp = metrics.ConfusionMatrixDisplay(confusion_matrix=cm)
@@ -35,7 +34,7 @@ disp.plot().figure_.savefig('Confusion_matrix_Ozone_NB.png')
 
 # Cross Validation
 start = time.time()
-scores = cross_val_score(model, X, y, cv=5)
+scores = cross_val_score(model, X, y, cv=10)
 end = time.time()
 elapsed_time = end - start
 print("Cross validation yielded %0.2f accuracy with a standard deviation of %0.2f in time %0.2f s" % (

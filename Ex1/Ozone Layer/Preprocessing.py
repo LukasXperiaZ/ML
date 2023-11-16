@@ -23,19 +23,26 @@ for i, column in enumerate(df_str.columns):
     count = (df_str[column] == '?').sum()
     missing_values_df.loc[i] = [column, count, round((count/length)*100, 1)]
 
+
 # Based on the data structure (numerical hourly weather data) we first thought
 # that linear interpolation would be a good choice to handle missing data.
-# However, since there are roughly 200 consecutive datapoints missing
-# linear interpolation as well as ffill might not be the best choice. Therefore, we decided to drop the missing data.
+# However, since there are specific dates with roughly 200 consecutive datapoints missing
+# For that linear interpolation might not be the best option. Therefore, we decided to drop these datapoints.
 df = df.replace('?', np.NaN)
-df = df.dropna()
+print(f"Size before: {df.shape}")
+print(f"Missing values before: {df.isna().sum().sum()}")
 
 # Change datatypes of columns respectively
 for col in df.columns:
     if col != 'Date':
         df[col] = pd.to_numeric(df[col])
-
 df['Class'] = df['Class'].astype(bool)
+
+# Try interpolation for as many as possible, maximum of 10 consecutive missing values
+df = df.interpolate(method = "linear", limit = 10)
+print(f"Missing values after interpolation: {df.isna().sum().sum()}")
+df = df.dropna()
+print(f"Size after dropping the rest: {df.shape}")
 
 # Check if there are no remaining missing values
 assert ((df == '?').sum().sum() == 0)

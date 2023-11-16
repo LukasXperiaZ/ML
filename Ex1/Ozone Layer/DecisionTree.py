@@ -18,7 +18,11 @@ y = df.Class
 X_train, X_test, y_train, y_test = train_test_split(X, y, test_size=0.3, random_state=1)
 
 # Create Decision Tree classifier object
-clf = DecisionTreeClassifier(criterion = 'gini')
+# criterion = 'gini', 'log_loss', 'entropy
+#
+clf = DecisionTreeClassifier(criterion = 'log_loss',
+                             max_depth = 8,
+                             class_weight={0: 0.1, 1: 0.9})
 
 start = time.time()
 # Train Decision Tree Classifier
@@ -55,11 +59,12 @@ graph = pydotplus.graph_from_dot_data(dot_data.getvalue())
 graph.write_png('DecisionTree_Ozone.png')
 Image(graph.create_png())
 
+'''
 # Since the class '1' is obviously underpresented we are trying in the following to countersteer
 # by adding more observations of this class using the SMOTE method.
 from imblearn.over_sampling import SMOTE
 
-sm = SMOTE(random_state=22)
+sm = SMOTE(random_state=1)
 X_train_res, y_train_res = sm.fit_resample(X_train, y_train)
 
 start = time.time()
@@ -77,13 +82,4 @@ print(metrics.classification_report(y_test, pred_test))
 cm = metrics.confusion_matrix(y_test, pred_test)
 disp = metrics.ConfusionMatrixDisplay(confusion_matrix=cm)
 disp.plot().figure_.savefig('Confusion_matrix_Ozone_DT_resampled.png')
-
-# Cross Validation
-start = time.time()
-scores = cross_val_score(clf, X, y, cv=5)
-end = time.time()
-elapsed_time = end - start
-print("Cross validation yielded %0.2f accuracy with a standard deviation of %0.2f in time %0.2f s" % (
-    scores.mean(),
-    scores.std(),
-    elapsed_time))
+'''

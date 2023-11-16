@@ -20,7 +20,8 @@ X_train = scaler.transform(X_train)
 X_test = scaler.transform(X_test)
 
 # Create Neural Network classifier object
-mlp = MLPClassifier(hidden_layer_sizes= (70, 100, 70),
+mlp = MLPClassifier(hidden_layer_sizes= (20,20,20),
+                    max_iter = 100,
                     activation='tanh',
                     solver='adam')
 
@@ -54,18 +55,13 @@ print("Cross validation yielded %0.2f accuracy with a standard deviation of %0.2
 # by adding more observations of this class using the SMOTE method.
 from imblearn.over_sampling import SMOTE
 
-sm = SMOTE(random_state=22)
+sm = SMOTE(random_state=1)
 X_train_res, y_train_res = sm.fit_resample(X_train, y_train)
 
 scaler = StandardScaler()
 scaler.fit(X_train_res)
 X_train_res = scaler.transform(X_train_res)
 X_test = scaler.transform(X_test)
-
-# Create Neural Network classifier object
-mlp = MLPClassifier(hidden_layer_sizes= (70, 100, 70),
-                    activation='tanh',
-                    solver='adam')
 
 start = time.time()
 # Train Neural Network
