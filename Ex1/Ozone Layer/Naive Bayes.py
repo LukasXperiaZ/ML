@@ -26,7 +26,7 @@ pred_train = model.predict(X_train)
 pred_test = model.predict(X_test)
 
 # Model Accuracy, how often is the classifier correct?
-print(f"Duration: {round(duration,2)}s")
+print(f"Duration: {round(duration,4)}s")
 print(metrics.classification_report(y_test, pred_test))
 cm = metrics.confusion_matrix(y_test, pred_test)
 disp = metrics.ConfusionMatrixDisplay(confusion_matrix=cm)

@@ -26,8 +26,8 @@ preprocessor = ColumnTransformer(
     ]
 )
 
-mlp = MLPClassifier(hidden_layer_sizes=(256, 128),
-                    max_iter=300,
+mlp = MLPClassifier(hidden_layer_sizes=(128, 64),
+                    max_iter=100,
                     activation="tanh",
                     solver="lbfgs")
 pipe = Pipeline(steps=[

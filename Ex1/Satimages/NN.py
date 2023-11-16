@@ -23,10 +23,10 @@ y = y_with_bytes.astype(str)
 X_train, X_test, y_train, y_test = train_test_split(X, y, test_size=0.3, random_state=1)
 
 # Create Neural Network classifier object
-mlp = MLPClassifier(hidden_layer_sizes= (50, 25, 20, 10),
-                    max_iter=100,
+mlp = MLPClassifier(hidden_layer_sizes= (100, 100, 10),
+                    max_iter=300,
                     activation='tanh',
-                    solver='adam')
+                    solver='lbfgs')
 
 start = time.time()
 # Train Neural Network
