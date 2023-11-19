@@ -15,7 +15,7 @@ y = X.pop("class")
 #Split into train and test dataset
 X_train, X_test, y_train, y_test = train_test_split(X, y, test_size=0.3, random_state=1)
 
-clf = GaussianNB(var_smoothing=0.00001)
+clf = GaussianNB(var_smoothing=1e-5)
 
 #Training
 start = time.time()
@@ -34,9 +34,9 @@ disp.plot().figure_.savefig("Cancer_NB_CM.png")
 
 #Cross-Validation
 start = time.time()
-scores = cross_val_score(clf, X, y, cv=5, scoring="f1_macro")
+scores = cross_val_score(clf, X, y, cv=5)
 elapsed = time.time() - start
-print(f"F1 avg from CV: {scores.mean()}")
+print(f"avg from CV: {scores.mean()}")
 print(f"Time needed: {elapsed}")
 
 

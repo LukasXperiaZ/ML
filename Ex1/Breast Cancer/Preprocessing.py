@@ -6,7 +6,7 @@ import pandas as pd
 # All features numerical
 def preprocess():
     breast_learn = pd.read_csv("../../datasets/BreastCancer/breast-cancer-diagnostic.shuf.lrn.csv")
-    print(breast_learn.isnull().values.any())
+    print(len(breast_learn))
 
 
 if __name__ == "__main__":

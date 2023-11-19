@@ -24,7 +24,7 @@ preprocessor = ColumnTransformer(transformers=[
 X_train, X_test, y_train, y_test = train_test_split(X, y, test_size=0.3, random_state=1)
 
 #Building the classifier
-clf = DecisionTreeClassifier(criterion="log_loss", max_depth=3)
+clf = DecisionTreeClassifier(criterion="gini", max_depth=None)
 
 #Building pipeline
 pipe = Pipeline(steps=[

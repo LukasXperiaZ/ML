@@ -26,10 +26,10 @@ preprocessor = ColumnTransformer(
     ]
 )
 
-mlp = MLPClassifier(hidden_layer_sizes=(256, 128),
-                    max_iter=300,
+mlp = MLPClassifier(hidden_layer_sizes=(128, 64),
+                    max_iter=100,
                     activation="tanh",
-                    solver='adam')
+                    solver="lbfgs")
 pipe = Pipeline(steps=[
     ('pre', preprocessor),
     ('mlpc', mlp)
@@ -46,7 +46,7 @@ print(f"F1 score: {metrics.f1_score(y_test, y_pred, average='weighted')}")
 print(f"Time to fit: {elapsed}")
 cm = metrics.confusion_matrix(y_test, y_pred)
 disp = metrics.ConfusionMatrixDisplay(confusion_matrix=cm)
-disp.plot().figure_.savefig("Cancer_NN_CM.png")
+#disp.plot().figure_.savefig("Cancer_NN_CM.png")
 
 # Cross-Validation
 start = time.time()

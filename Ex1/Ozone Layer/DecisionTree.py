@@ -20,9 +20,9 @@ X_train, X_test, y_train, y_test = train_test_split(X, y, test_size=0.3, random_
 # Create Decision Tree classifier object
 # criterion = 'gini', 'log_loss', 'entropy
 #
-clf = DecisionTreeClassifier(criterion = 'log_loss',
-                             max_depth = 8,
-                             class_weight={0: 0.1, 1: 0.9})
+clf = DecisionTreeClassifier(criterion = 'gini',
+                             max_depth = 5,
+                             class_weight={0: 0.2, 1: 0.8})
 
 start = time.time()
 # Train Decision Tree Classifier
@@ -59,7 +59,7 @@ graph = pydotplus.graph_from_dot_data(dot_data.getvalue())
 graph.write_png('DecisionTree_Ozone.png')
 Image(graph.create_png())
 
-'''
+
 # Since the class '1' is obviously underpresented we are trying in the following to countersteer
 # by adding more observations of this class using the SMOTE method.
 from imblearn.over_sampling import SMOTE
@@ -82,4 +82,4 @@ print(metrics.classification_report(y_test, pred_test))
 cm = metrics.confusion_matrix(y_test, pred_test)
 disp = metrics.ConfusionMatrixDisplay(confusion_matrix=cm)
 disp.plot().figure_.savefig('Confusion_matrix_Ozone_DT_resampled.png')
-'''
+

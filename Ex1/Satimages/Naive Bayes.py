@@ -14,7 +14,7 @@ y = X.pop("class").astype(str)
 #Split into train and test dataset
 X_train, X_test, y_train, y_test = train_test_split(X, y, test_size=0.3, random_state=1)
 
-clf = GaussianNB()
+clf = GaussianNB(var_smoothing=1e-12)
 
 #Training
 start = time.time()
