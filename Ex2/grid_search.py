@@ -23,7 +23,7 @@ class GridSearchMLP:
                     for solver in self.params["solver"]:
                         preprocessor = ColumnTransformer(
                             transformers=[
-                                ("scaler", StandardScaler(), X.select_dtypes(include="float64").columns),
+                                ("scaler", StandardScaler(), X.select_dtypes(exclude="object").columns),
                                 ("onehot", OneHotEncoder(handle_unknown="ignore"), X.select_dtypes(include="object").columns)
                             ]
                         )
