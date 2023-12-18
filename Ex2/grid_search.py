@@ -21,28 +21,30 @@ class GridSearchMLP:
             for hidden_layer_sizes in permutations(self.params["nr_neurons"], r=nr_hidden_layers):
                 for activation in self.params["activation"]:
                     for solver in self.params["solver"]:
-                        preprocessor = ColumnTransformer(
-                            transformers=[
-                                ("scaler", StandardScaler(), X.select_dtypes(exclude="object").columns),
-                                ("onehot", OneHotEncoder(handle_unknown="ignore"), X.select_dtypes(include="object").columns)
-                            ]
-                        )
-                        mlp = MLPClassifier(hidden_layer_sizes=hidden_layer_sizes,
-                                            activation=activation,
-                                            solver=solver)
-                        pipe = Pipeline(steps=[
-                            ('pre', preprocessor),
-                            ('mlpc', mlp)
-                        ])
-                        scores = cross_val_score(pipe, X, y, cv=5, scoring="accuracy")
-                        if scores.mean() > self.best_score:
-                            self.best_score = scores.mean()
-                            self.best_params = {
-                                "hidden_layer_sizes": hidden_layer_sizes,
-                                "activation": activation,
-                                "solver": solver
-                            }
-                            self.best_model = pipe
-                        
-                            print(f"Found new best parameters: {hidden_layer_sizes}, {activation}, {solver}")
+                        for alpha in self.params["alpha"]:
+                            preprocessor = ColumnTransformer(
+                                transformers=[
+                                    ("scaler", StandardScaler(), X.select_dtypes(exclude="object").columns),
+                                    ("onehot", OneHotEncoder(handle_unknown="ignore"), X.select_dtypes(include="object").columns)
+                                ]
+                            )
+                            mlp = MLPClassifier(hidden_layer_sizes=hidden_layer_sizes,
+                                                activation=activation,
+                                                solver=solver,
+                                                alpha=alpha)
+                            pipe = Pipeline(steps=[
+                                ('pre', preprocessor),
+                                ('mlpc', mlp)
+                            ])
+                            scores = cross_val_score(pipe, X, y, cv=5, scoring="accuracy")
+                            if scores.mean() > self.best_score:
+                                self.best_score = scores.mean()
+                                self.best_params = {
+                                    "hidden_layer_sizes": hidden_layer_sizes,
+                                    "activation": activation,
+                                    "solver": solver
+                                }
+                                self.best_model = pipe
+                            
+                                print(f"Found new best parameters: {hidden_layer_sizes}, {activation}, {solver}")
         
