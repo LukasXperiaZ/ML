@@ -30,6 +30,8 @@ def breast_cancer_preprocessing():
     return X, Y, preprocessor
 
 def evolutionary_optimization(X, Y, preprocessor, pool_size: int):
+    # https://en.wikipedia.org/wiki/Hyperparameter_optimization
+    # https://en.wikipedia.org/wiki/Crossover_(genetic_algorithm)
 
     mlps: List[MLPClassifier] = []
     for i in range(pool_size):
