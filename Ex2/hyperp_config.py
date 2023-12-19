@@ -1,6 +1,6 @@
-import time
 from enum import Enum
-from random import seed, random
+from enum import Enum
+from random import random
 from typing import List
 
 from sklearn.neural_network import MLPClassifier
@@ -125,6 +125,7 @@ class HyperpConfig(object):
             n_iter_no_change=self.n_iter_no_change
         )
 
+    # Used for random initialization of selected parameters (others will have default values)
     def random_init(self):
         # min max definitions
         min_hidden_layers = 1
@@ -182,10 +183,13 @@ class HyperpConfig(object):
             self.learning_rate = LearningRate.invscaling
 
         # max_iter
-        if self.solver == Solver.sgd or self.solver == Solver.adam:
-            r_max_iter = int(max_iter_min + (random() * (max_iter_max - max_iter_min)))
-            self.max_iter = r_max_iter
+        # We also set max_iter if it does not have any effect, because through crossover or mutation,
+        #   it could have an effect in the future!
+        # if self.solver == Solver.sgd or self.solver == Solver.adam:
+        r_max_iter = int(max_iter_min + (random() * (max_iter_max - max_iter_min)))
+        self.max_iter = r_max_iter
 
+    # We don't use this method!
     def random_init_all(self):
         # min max definitions
         min_hidden_layers = 1
@@ -267,7 +271,7 @@ class HyperpConfig(object):
         # learning_rate_init
         if self.solver == Solver.sgd or self.solver == Solver.adam:
             r_learning_rate_init = learning_rate_init_min + (
-                        random() * (learning_rate_init_max - learning_rate_init_min))
+                    random() * (learning_rate_init_max - learning_rate_init_min))
             self.learning_rate_init = r_learning_rate_init
 
         # power_t

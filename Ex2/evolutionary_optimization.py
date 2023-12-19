@@ -131,6 +131,41 @@ def evolutionary_optimization(X, Y, preprocessor, pool_size: int):
         for i in range(0, pool_size - len(only_best_mean_score_dict)):
             pass
             # TODO
+            # parent_1 = random config of only_best_mean_score_dict
+            # parent_2 = random config of only_best_mean_score_dict
+
+            # for every attribute in config:
+            #   NOTE: We only use the attributes (also see random_init(self) in hyperp_config.py):
+            #       - hidden_layer_sizes
+            #       - activation
+            #       - solver
+            #       - alpha
+            #       - learning_rate
+            #       - max_iter
+            # === CROSSOVER ===
+            #   create new config
+            new_config = HyperpConfig()
+            #   take with prob 50% the attribute from parent_1, and with the other 50% from parent_2
+            #       and set new_config.attribute = parent_x.attribute
+            #
+            # === MUTATION ===
+            #   with probability 5%, mutate the newly set attribute of the child:
+            #       Mutation rules:
+            #           1. hidden_layer_sizes: either increase or decrease the number of layers by 1
+            #               - The newly created layer should have random amount of nodes (see e.g. random_init function)
+            #           2. For each layer:
+            #               - with prob 5%, mutate, i.e. increase or decrease the number of nodes by 1
+            #
+            #           3. activation: choose randomly a new activation function from enum Activation
+            #
+            #           4. solver: choose randomly a new solver from enum Solver
+            #
+            #           5. alpha: increase or decrease alpha by 0.0001
+            #
+            #           6. learning_rate: choose randomly a new learning rate from enum LearningRate
+            #
+            #           7. max_iter: increase or decrease max_iter by 50
+
             # put generated (HyperpConfig, MLPClassifier) tuples in mlps list
             # mlps.append((..., ...))
 
