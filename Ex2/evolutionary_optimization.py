@@ -130,6 +130,7 @@ def evolutionary_optimization(X, Y, preprocessor, pool_size: int):
         # Generate pool_size - len(only_best_mean_score_dict) new configs with crossover and mutation
         for i in range(0, pool_size - len(only_best_mean_score_dict)):
             pass
+            # TODO
             # put generated (HyperpConfig, MLPClassifier) tuples in mlps list
             # mlps.append((..., ...))
 
