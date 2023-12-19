@@ -145,8 +145,8 @@ def evolutionary_optimization(X, Y, preprocessor, pool_size: int):
             # === CROSSOVER ===
             #   create new config
             new_config = HyperpConfig()
-            #   take with prob 50% the attribute from parent_1, and with the other 50% from parent_2
-            #       and set new_config.attribute = parent_x.attribute
+            #   take with prob 50% (random() is already seeded) the attribute from parent_1,
+            #       and with the other 50% from parent_2 and set new_config.attribute = parent_x.attribute
             #
             # === MUTATION ===
             #   with probability 5%, mutate the newly set attribute of the child:
