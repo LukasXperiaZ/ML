@@ -1,13 +1,11 @@
-from typing import List
+from typing import List, Dict
 
-from sklearn.model_selection import train_test_split, cross_val_score
-from sklearn.preprocessing import StandardScaler
-from sklearn.pipeline import Pipeline
-from sklearn.compose import ColumnTransformer
-from sklearn.neural_network import MLPClassifier
-from sklearn import metrics
-import time
 import pandas as pd
+from sklearn.compose import ColumnTransformer
+from sklearn.model_selection import cross_val_score
+from sklearn.neural_network import MLPClassifier
+from sklearn.pipeline import Pipeline
+from sklearn.preprocessing import StandardScaler
 
 from Ex2.hyperp_config import HyperpConfig
 
@@ -29,18 +27,19 @@ def breast_cancer_preprocessing():
 
     return X, Y, preprocessor
 
+
 def evolutionary_optimization(X, Y, preprocessor, pool_size: int):
     # https://en.wikipedia.org/wiki/Hyperparameter_optimization
     # https://en.wikipedia.org/wiki/Crossover_(genetic_algorithm)
 
+    # create pool_size many mlp with randomly initialized hyperparameters
     mlps: List[MLPClassifier] = []
     for i in range(pool_size):
-        # create pool_size many mlp with randomly initialized hyperparameters
         hyper_p_config = HyperpConfig()
         hyper_p_config.random_init()
         mlps.append(hyper_p_config.create_initialized_mlp())
 
-    mean_score_list: List[float] = []
+    mean_score_dict: Dict[float, MLPClassifier] = {}
 
     for mlp in mlps:
         pipe = Pipeline(steps=[
@@ -50,9 +49,9 @@ def evolutionary_optimization(X, Y, preprocessor, pool_size: int):
 
         scores = cross_val_score(pipe, X, Y, cv=5, scoring="f1_macro")
         mean = scores.mean()
-        mean_score_list.append(mean)
+        mean_score_dict[mean] = mlp
 
-    print(mean_score_list)
+    print(list(mean_score_dict.keys()))
 
 
 if __name__ == "__main__":

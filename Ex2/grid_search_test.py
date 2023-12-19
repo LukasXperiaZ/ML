@@ -20,7 +20,7 @@ y = X.pop("class")
 # %%
 params = {
     "nr_hidden_layers": list(range(1, 11)),
-    "nr_neurons": [32, 64],
+    "nr_neurons": [1, 2, 5, 10],
     "activation": ["tanh", "relu", "logistic", "identity"],
     "solver": ["adam", "lbfgs", "sgd"],
     "alpha": [0.00001, 0.0001, 0.001]

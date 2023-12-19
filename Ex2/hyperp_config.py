@@ -74,6 +74,7 @@ class HyperpConfig(object):
     #   (how many times each data point will be used), not the number of gradient steps.
     max_iter: int = 200
 
+    # Precondition: learning_rate != 'adaptive'
     # Tolerance for the optimization. When the loss or score is not improving by at least tol for n_iter_no_change
     #   consecutive iterations, unless learning_rate is set to 'adaptive', convergence is considered to be reached
     #   and training stops.
@@ -127,6 +128,69 @@ class HyperpConfig(object):
         alpha_min = 0.00001
         alpha_max = 0.001
 
+        max_iter_min = 50
+        max_iter_max = 500
+
+        # random initialization
+        seed(time.time())
+        hidden_layers: int = int(min_hidden_layers + (random() * (max_hidden_layers - min_hidden_layers)))
+        hidden_layers_sizes: List[int] = []
+        for i in range(hidden_layers):
+            hidden_layers_sizes.append(
+                int(min_nodes_per_layer + (random() * (max_nodes_per_layer - min_nodes_per_layer))))
+
+        # hidden_layer_sizes
+        self.hidden_layer_sizes = hidden_layers_sizes
+
+        # activation
+        r_activation = random()
+        if r_activation < 0.25:
+            self.activation = Activation.relu
+        elif 0.25 <= r_activation < 0.5:
+            self.activation = Activation.tanh
+        elif 0.5 <= r_activation < 0.75:
+            self.activation = Activation.identity
+        else:
+            self.activation = Activation.logistic
+
+        # solver
+        r_solver = random()
+        if r_solver < 0.3333:
+            self.solver = Solver.adam
+        elif 0.3333 <= r_solver < 0.6666:
+            self.solver = Solver.sgd
+        else:
+            self.solver = Solver.lbfgs
+
+        # alpha
+        r_alpha = alpha_min + (random() * (alpha_max - alpha_min))
+        self.alpha = r_alpha
+
+        # learning_rate
+        r_learning_rate = random()
+        if r_learning_rate < 0.3333:
+            self.learning_rate = LearningRate.constant
+        elif 0.3333 <= r_learning_rate < 0.6666:
+            self.learning_rate = LearningRate.adaptive
+        else:
+            self.learning_rate = LearningRate.invscaling
+
+        # max_iter
+        if self.solver == Solver.sgd or self.solver == Solver.adam:
+            r_max_iter = int(max_iter_min + (random() * (max_iter_max - max_iter_min)))
+            self.max_iter = r_max_iter
+
+    def random_init_all(self):
+        # min max definitions
+        min_hidden_layers = 1
+        max_hidden_layers = 10
+
+        min_nodes_per_layer = 1
+        max_nodes_per_layer = 10
+
+        alpha_min = 0.00001
+        alpha_max = 0.001
+
         learning_rate_init_min = 0.01
         learning_rate_init_max = 0.0001
 
@@ -134,7 +198,7 @@ class HyperpConfig(object):
         power_t_max = 0.8
 
         max_iter_min = 50
-        max_iter_max = 1000
+        max_iter_max = 500
 
         r_tol_min = 1e-3
         r_tol_max = 1e-5
