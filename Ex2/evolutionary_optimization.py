@@ -1,3 +1,4 @@
+from random import seed
 from typing import List, Dict
 
 from sklearn.compose import ColumnTransformer
@@ -75,6 +76,9 @@ def satimages_preprocessing():
 def evolutionary_optimization(X, Y, preprocessor, pool_size: int):
     # https://en.wikipedia.org/wiki/Hyperparameter_optimization
     # https://en.wikipedia.org/wiki/Crossover_(genetic_algorithm)
+
+    # random initialization
+    seed(time.time())
 
     # create pool_size many mlp with randomly initialized hyperparameters
     mlps: List[MLPClassifier] = []

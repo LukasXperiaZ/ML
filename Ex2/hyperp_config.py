@@ -131,8 +131,6 @@ class HyperpConfig(object):
         max_iter_min = 50
         max_iter_max = 500
 
-        # random initialization
-        seed(time.time())
         hidden_layers: int = int(min_hidden_layers + (random() * (max_hidden_layers - min_hidden_layers)))
         hidden_layers_sizes: List[int] = []
         for i in range(hidden_layers):
@@ -216,7 +214,6 @@ class HyperpConfig(object):
         n_iter_no_change_max = 30
 
         # random initialization
-        seed(time.time())
         hidden_layers: int = int(min_hidden_layers + (random() * (max_hidden_layers - min_hidden_layers)))
         hidden_layers_sizes: List[int] = []
         for i in range(hidden_layers):
