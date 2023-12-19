@@ -1,5 +1,8 @@
 from typing import List, Dict
 
+from sklearn.model_selection import train_test_split, cross_val_score
+from sklearn.preprocessing import StandardScaler, OneHotEncoder
+from sklearn.pipeline import Pipeline
 import pandas as pd
 from sklearn.compose import ColumnTransformer
 from sklearn.model_selection import cross_val_score
@@ -8,6 +11,11 @@ from sklearn.pipeline import Pipeline
 from sklearn.preprocessing import StandardScaler
 
 from Ex2.hyperp_config import HyperpConfig
+from sklearn import metrics
+import time
+import pandas as pd
+from scipy.io import arff
+from hyperp_config import HyperpConfig
 
 
 def breast_cancer_preprocessing():
@@ -18,6 +26,47 @@ def breast_cancer_preprocessing():
     # Extract the label
     X = breast_data.copy(deep=True)
     Y = X.pop("class")
+
+    preprocessor = ColumnTransformer(
+        transformers=[
+            ("scaler", StandardScaler(), X.columns)
+        ]
+    )
+
+    return X, Y, preprocessor
+
+def loan_preprocessing():
+    # load data
+    loan = pd.read_csv("../datasets/Loan/loan-10k.lrn.csv", engine='python')
+
+    # preprocessing
+    X = loan.drop(['ID', 'grade'], axis = 1)
+    Y = loan.grade
+
+    numeric_features = X.drop(
+        ['term', 'emp_length', 'home_ownership', 'verification_status', 'loan_status',
+         'pymnt_plan', 'purpose', 'addr_state', 'initial_list_status', 'application_type',
+         'hardship_flag', 'debt_settlement_flag', 'disbursement_method'],
+        axis=1
+    ).columns
+
+    categorical_features = X.select_dtypes(include=['object']).columns
+
+    preprocessor = ColumnTransformer(
+        transformers=[
+            ('scaler', StandardScaler(), numeric_features),
+            ('onehot', OneHotEncoder(handle_unknown='ignore'), categorical_features)
+        ]
+    )
+
+    return X, Y, preprocessor
+
+def satimages_preprocessing():
+    satimage_arff = arff.loadarff('../datasets/Satimage/dataset_186_satimage.arff')
+    satimage = pd.DataFrame(satimage_arff[0])
+
+    X = satimage.drop(['class'], axis = 1)
+    Y = satimage['class'].astype(str)
 
     preprocessor = ColumnTransformer(
         transformers=[

@@ -76,7 +76,7 @@ def classify():
 
     start = time.time()
     # train the MLP classifier
-    mlp = MLPClassifier(hidden_layer_sizes=(10, 10, 10),
+    mlp = MLPClassifier(hidden_layer_sizes=(10, 20, 10),
                         max_iter=300,
                         activation='tanh',
                         solver='adam')
