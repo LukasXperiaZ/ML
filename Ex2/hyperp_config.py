@@ -59,10 +59,12 @@ class HyperpConfig(object):
     # Learning rate
     learning_rate: LearningRate = LearningRate.constant
 
+    # !!! NOT USED !!!
     # Precondition solver=sgd or adam
     # The initial learning rate used. It controls the step-size in updating the weights.
     learning_rate_init: float = 0.001
 
+    # !!! NOT USED !!!
     # Precondition: solver='sgd', learning_rate='invscaling'
     # The exponent for inverse scaling learning rate. It is used in updating effective learning rate when
     #   the learning_rate is set to 'invscaling'.
@@ -74,28 +76,34 @@ class HyperpConfig(object):
     #   (how many times each data point will be used), not the number of gradient steps.
     max_iter: int = 200
 
+    # !!! NOT USED !!!
     # Precondition: learning_rate != 'adaptive'
     # Tolerance for the optimization. When the loss or score is not improving by at least tol for n_iter_no_change
     #   consecutive iterations, unless learning_rate is set to 'adaptive', convergence is considered to be reached
     #   and training stops.
     tol: float = 1e-4
 
+    # !!! NOT USED !!!
     # Precondition: solver='sgd'
     # Momentum for gradient descent update. Should be between 0 and 1. Only used when solver='sgd'.
     momentum: float = 0.9
 
+    # !!! NOT USED !!!
     # Precondition: solver='sgd'
     # Whether to use Nesterov's momentum. Only used when solver='sgd' and momentum > 0.
     nesterovs_momentum: bool = True
 
+    # !!! NOT USED !!!
     # Precondition: solver='adam'
     # Exponential decay rate for estimates of first moment vector in adam, should be in [0, 1).
     beta_1: float = 0.9
 
+    # !!! NOT USED !!!
     # Precondition: solver='adam'
     # Exponential decay rate for estimates of second moment vector in adam, should be in [0, 1).
     beta_2: float = 0.999
 
+    # !!! NOT USED !!!
     # Precondition: solver='sgd' or 'adam'
     # Maximum number of epochs to not meet tol improvement.
     n_iter_no_change: int = 10
@@ -217,7 +225,8 @@ class HyperpConfig(object):
         hidden_layers: int = int(min_hidden_layers + (random() * (max_hidden_layers - min_hidden_layers)))
         hidden_layers_sizes: List[int] = []
         for i in range(hidden_layers):
-            hidden_layers_sizes.append(int(min_nodes_per_layer + (random() * (max_nodes_per_layer - min_nodes_per_layer))))
+            hidden_layers_sizes.append(
+                int(min_nodes_per_layer + (random() * (max_nodes_per_layer - min_nodes_per_layer))))
 
         # hidden_layer_sizes
         self.hidden_layer_sizes = hidden_layers_sizes
@@ -257,7 +266,8 @@ class HyperpConfig(object):
 
         # learning_rate_init
         if self.solver == Solver.sgd or self.solver == Solver.adam:
-            r_learning_rate_init = learning_rate_init_min + (random() * (learning_rate_init_max - learning_rate_init_min))
+            r_learning_rate_init = learning_rate_init_min + (
+                        random() * (learning_rate_init_max - learning_rate_init_min))
             self.learning_rate_init = r_learning_rate_init
 
         # power_t
@@ -304,3 +314,12 @@ class HyperpConfig(object):
             r_n_iter_no_change = int(n_iter_no_change_min + (random() * (n_iter_no_change_max - n_iter_no_change_min)))
             self.n_iter_no_change = r_n_iter_no_change
 
+    def __str__(self):
+        return ("Hyperparameters:\n"
+                + "\t" + "hidden_layer_sizes = " + str(tuple(self.hidden_layer_sizes)) + "\n"
+                + "\t" + "activation = " + str(self.activation.value) + "\n"
+                + "\t" + "solver = " + str(self.solver.value) + "\n"
+                + "\t" + "alpha = " + str(self.alpha) + "\n"
+                + "\t" + "learning_rate = " + str(self.learning_rate) + "\n"
+                + "\t" + "max_iter = " + str(self.max_iter)
+                )
