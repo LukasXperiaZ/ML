@@ -146,6 +146,9 @@ def evolutionary_optimization(X, Y, preprocessor, pool_size: int):
     best_mean_prev: float = 0
     start_time = time.time()
     max_time = 60 * 60 + 5  # max time in seconds (65 min)
+    # key: iteration, value: (Config, mean)
+    performance_dict: Dict[int, (float, HyperpConfig, float)] = {}
+    p_d_i = 0
     while time.time() - start_time < max_time:
         # 2. Evaluate the hyperparameter tuples and acquire their fitness function (5-fold cross-validation f1 value)
         for hyper_p_config, mlp in mlps:
@@ -238,6 +241,21 @@ def evolutionary_optimization(X, Y, preprocessor, pool_size: int):
             return h_p_conf, b_mlp, best_mean
 
         best_mean_prev = best_mean
+        h_p_conf, b_mlp = final_sorted_mean_dict[best_mean]
+        performance_dict[p_d_i] = (time.time() - start_time, h_p_conf, best_mean)
+        p_d_i += 1
+
+    for p_d_i in performance_dict.keys():
+        elapsed_time, h_p_conf, mean = performance_dict[p_d_i]
+        if elapsed_time > 10*60:
+            print("After", elapsed_time, "minutes after iteration ", p_d_i, ", we get a mean of:", mean,
+                  " with the hyperparameter config:\n", h_p_conf)
+        if elapsed_time > 30*60:
+            print("After", elapsed_time, "minutes after iteration ", p_d_i, ", we get a mean of:", mean,
+                  " with the hyperparameter config:\n", h_p_conf)
+        if elapsed_time > 60*60:
+            print("After", elapsed_time, "minutes after iteration ", p_d_i, ", we get a mean of:", mean,
+                  " with the hyperparameter config:\n", h_p_conf)
 
     print("Ran out of time, quitting.")
     h_conf, mlp_ = mean_score_dict[best_mean_prev]
