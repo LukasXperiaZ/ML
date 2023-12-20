@@ -1,3 +1,4 @@
+import random
 from random import seed
 from typing import List, Dict
 
@@ -11,7 +12,7 @@ from sklearn import metrics
 import time
 import pandas as pd
 from scipy.io import arff
-from hyperp_config import HyperpConfig
+from hyperp_config import HyperpConfig, Activation, Solver, LearningRate
 
 
 def breast_cancer_preprocessing():
@@ -128,8 +129,57 @@ def evolutionary_optimization(X, Y, preprocessor, pool_size: int):
         mlps: List[(HyperpConfig, MLPClassifier)] = list(only_best_mean_score_dict.values())
 
         # Generate pool_size - len(only_best_mean_score_dict) new configs with crossover and mutation
+
+        def crossover(parent_1: HyperpConfig, parent_2: HyperpConfig) -> HyperpConfig:
+            child_config = HyperpConfig()
+            for attr in ['hidden_layer_sizes', 'activation', 'solver', 'alpha', 'learning_rate', 'max_iter']:
+                if random.random() < 0.5:
+                    setattr(child_config, attr, getattr(parent_1, attr))
+                else:
+                    setattr(child_config, attr, getattr(parent_2, attr))
+            return child_config
+
+        def mutate(config: HyperpConfig) -> HyperpConfig:
+            if random.random() < 0.05:
+
+                # mutate hidden_layer_sizes
+                num_layers = len(config.hidden_layer_sizes)
+                if random.random() < 0.5:
+                    num_layers += 1
+                    config.hidden_layer_sizes.append(random.randint(1, 100))
+                else:
+                    num_layers -= 1
+                    config.hidden_layer_sizes.pop()
+
+                # mutate each layer
+                for i in range(num_layers):
+                    if random.random() < 0.05:
+                        config.hidden_layer_sizes[i] += random.choice(list(range(-3, 4)))
+
+                # mutate activation
+                config.activation = random.choice(list(Activation))
+
+                # mutate solver
+                config.solver = random.choice(list(Solver))
+
+                # mutate alpha
+                config.alpha += random.choice([-0.0001, 0.0001])
+
+                # mutate learning_rate
+                config.learning_rate = random.choice(list(LearningRate))
+
+                # mutate max_iter
+                config.max_iter += random.choice([-50, 50])
+            return config
+
         for i in range(0, pool_size - len(only_best_mean_score_dict)):
-            pass
+            parent_1 = random.choice(list(only_best_mean_score_dict.values()))[0]
+            parent_2 = random.choice(list(only_best_mean_score_dict.values()))[0]
+            child_config = crossover(parent_1, parent_2)
+            child_config = mutate(child_config)
+
+            mlps.append((child_config, child_config.create_initialized_mlp()))
+
             # TODO
             # parent_1 = random config of only_best_mean_score_dict
             # parent_2 = random config of only_best_mean_score_dict
@@ -144,7 +194,7 @@ def evolutionary_optimization(X, Y, preprocessor, pool_size: int):
             #       - max_iter
             # === CROSSOVER ===
             #   create new config
-            new_config = HyperpConfig()
+            # new_config = HyperpConfig()
             #   take with prob 50% (random() is already seeded) the attribute from parent_1,
             #       and with the other 50% from parent_2 and set new_config.attribute = parent_x.attribute
             #
@@ -187,7 +237,7 @@ def evolutionary_optimization(X, Y, preprocessor, pool_size: int):
 
 if __name__ == "__main__":
     bc_X, bc_Y, bc_preprocessor = breast_cancer_preprocessing()
-    hyper_p_config, mlp, best_mean = evolutionary_optimization(bc_X, bc_Y, bc_preprocessor, 10)
+    hyper_p_config, mlp, best_mean = evolutionary_optimization(bc_X, bc_Y, bc_preprocessor, 4)
     print("Best config is:")
     print(hyper_p_config, "\n",
           "With mean f1 score: ", best_mean)
