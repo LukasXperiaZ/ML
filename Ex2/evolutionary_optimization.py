@@ -12,6 +12,7 @@ from sklearn import metrics
 import time
 import pandas as pd
 from scipy.io import arff
+import matplotlib.pyplot as plt
 from hyperp_config import HyperpConfig, Activation, Solver, LearningRate
 
 
@@ -113,7 +114,9 @@ def mutate(config: HyperpConfig) -> HyperpConfig:
 
     if random.random() < 0.05:
         # mutate alpha
-        config.alpha += random.choice([-0.0001, 0.0001])
+        config.alpha += random.choice([-0.00001, 0.00001])
+        if config.alpha < 0:
+            config.alpha = 0
 
     if random.random() < 0.05:
         # mutate learning_rate
@@ -168,8 +171,7 @@ def evolutionary_optimization(X, Y, preprocessor, pool_size: int):
         mean_score_sorted_dict = dict(sorted(mean_score_dict.items()))
 
         # 4. Replace the worst-performing hyperparameter tuples with new hyperparameter tuples generated through
-        #   - crossover and
-        #   - mutation
+        #   crossover and mutation
         delete_percentage = 0.3
         n_delete = len(mean_score_sorted_dict) * delete_percentage
         only_best_mean_score_dict: Dict[float, (HyperpConfig, MLPClassifier)] = {}
@@ -184,7 +186,6 @@ def evolutionary_optimization(X, Y, preprocessor, pool_size: int):
         mlps: List[(HyperpConfig, MLPClassifier)] = list(only_best_mean_score_dict.values())
 
         # Generate pool_size - len(only_best_mean_score_dict) new configs with crossover and mutation
-
         for i in range(0, pool_size - len(only_best_mean_score_dict)):
             parent_1 = random.choice(list(only_best_mean_score_dict.values()))[0]
             parent_2 = random.choice(list(only_best_mean_score_dict.values()))[0]
@@ -193,57 +194,25 @@ def evolutionary_optimization(X, Y, preprocessor, pool_size: int):
 
             mlps.append((child_config, child_config.create_initialized_mlp()))
 
-            # parent_1 = random config of only_best_mean_score_dict
-            # parent_2 = random config of only_best_mean_score_dict
-
-            # for every attribute in config:
-            #   NOTE: We only use the attributes (also see random_init(self) in hyperp_config.py):
-            #       - hidden_layer_sizes
-            #       - activation
-            #       - solver
-            #       - alpha
-            #       - learning_rate
-            #       - max_iter
-            # === CROSSOVER ===
-            #   create new config
-            # new_config = HyperpConfig()
-            #   take with prob 50% (random() is already seeded) the attribute from parent_1,
-            #       and with the other 50% from parent_2 and set new_config.attribute = parent_x.attribute
-            #
-            # === MUTATION ===
-            #   with probability 5%, mutate the newly set attribute of the child:
-            #       Mutation rules:
-            #           1. hidden_layer_sizes: either increase or decrease the number of layers by 1
-            #               - The newly created layer should have random amount of nodes (see e.g. random_init function)
-            #           2. For each layer:
-            #               - with prob 5%, mutate, i.e. increase or decrease the number of nodes by 1
-            #
-            #           3. activation: choose randomly a new activation function from enum Activation
-            #
-            #           4. solver: choose randomly a new solver from enum Solver
-            #
-            #           5. alpha: increase or decrease alpha by 0.0001
-            #
-            #           6. learning_rate: choose randomly a new learning rate from enum LearningRate
-            #
-            #           7. max_iter: increase or decrease max_iter by 50
-
-            # put generated (HyperpConfig, MLPClassifier) tuples in mlps list
-            # mlps.append((..., ...))
-
         # 5. Repeat steps 2-4 until satisfactory algorithm performance is reached or algorithm is no longer improving.
         #       We look at the best mean score of this run (without generated configs)
-        final_sorted_mean_dict = dict(sorted(only_best_mean_score_dict.items()))
-        best_mean = list(final_sorted_mean_dict.keys())[len(final_sorted_mean_dict)-1]
-        if best_mean > 0.99 or best_mean - best_mean_prev < 0.01:
-            # finished
-            h_p_conf, b_mlp = final_sorted_mean_dict[best_mean]
-            return h_p_conf, b_mlp, best_mean
-
-        best_mean_prev = best_mean
-        h_p_conf, b_mlp = final_sorted_mean_dict[best_mean]
-        performance_dict[p_d_i] = (time.time() - start_time, h_p_conf, best_mean)
+        # final_sorted_mean_dict = dict(sorted(only_best_mean_score_dict.items()))
+        best_mean = sorted(list(only_best_mean_score_dict.keys()))[-1]
+        h_p_conf, b_mlp = only_best_mean_score_dict[best_mean]
+        performance_dict[p_d_i] = (round(time.time() - start_time, 2), h_p_conf, round(best_mean, 2))
         p_d_i += 1
+
+        if best_mean > 0.98 or (best_mean - best_mean_prev < 0.001 and best_mean != best_mean_prev) :
+            # finished
+            #h_p_conf, b_mlp = final_sorted_mean_dict[best_mean]
+            #return h_p_conf, b_mlp, best_mean
+            print(f'Break triggered with new best of {best_mean} and previous best {best_mean_prev}')
+            break
+        best_mean_prev = best_mean
+
+    #print("Ran out of time, quitting.")
+    #h_conf, mlp_ = mean_score_dict[best_mean_prev]
+    #return h_conf, mlp_, best_mean_prev
 
     for p_d_i in performance_dict.keys():
         elapsed_time, h_p_conf, mean = performance_dict[p_d_i]
@@ -257,14 +226,24 @@ def evolutionary_optimization(X, Y, preprocessor, pool_size: int):
             print("After", elapsed_time, "minutes after iteration ", p_d_i, ", we get a mean of:", mean,
                   " with the hyperparameter config:\n", h_p_conf)
 
-    print("Ran out of time, quitting.")
-    h_conf, mlp_ = mean_score_dict[best_mean_prev]
-    return h_conf, mlp_, best_mean_prev
+    return performance_dict
+
+
 
 
 if __name__ == "__main__":
     bc_X, bc_Y, bc_preprocessor = breast_cancer_preprocessing()
-    hyper_p_config, mlp, best_mean = evolutionary_optimization(bc_X, bc_Y, bc_preprocessor, 10)
-    print("Best config is:")
-    print(hyper_p_config, "\n",
-          "With mean f1 score: ", best_mean)
+    performance_dict = evolutionary_optimization(bc_X, bc_Y, bc_preprocessor, 10)
+    n_iterations, best_config = list(performance_dict.items())[-1]
+    print(f"After {best_config[0]} seconds in the {n_iterations}. iteration, we get a mean of {best_config[2]}"
+          f" with the following hyperparameter config:\n", best_config[1])
+    #print(performance_dict)
+
+    plt.plot(list(performance_dict.keys()),
+             [v[2] for v in performance_dict.values()],
+             '-o', color='blue')
+    plt.title('Learning curve of the algorithm')
+    plt.xlabel('Iterations')
+    plt.ylabel('Performance')
+    plt.savefig('Learning_Curve.png')
+
