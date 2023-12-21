@@ -18,7 +18,6 @@ class GridSearchMLP:
 
     
     def find_params(self, X, y):
-        start_time = time.time()
         for nr_hidden_layers in self.params["nr_hidden_layers"]:
             for hidden_layer_sizes in permutations(self.params["nr_neurons"], r=nr_hidden_layers):
                 for activation in self.params["activation"]:
@@ -51,5 +50,3 @@ class GridSearchMLP:
                             
                                 print(f"Found new best parameters: {hidden_layer_sizes}, {activation}, {solver}")
         
-        end_time = time.time()
-        print("Total time: ", end_time - start_time)
