@@ -3,6 +3,7 @@ from random import seed
 from typing import List, Dict
 
 from sklearn.compose import ColumnTransformer
+from sklearn.metrics import f1_score
 from sklearn.model_selection import cross_val_score, train_test_split
 from sklearn.neural_network import MLPClassifier
 from sklearn.pipeline import Pipeline
@@ -86,7 +87,8 @@ def crossover(parent_1: HyperpConfig, parent_2: HyperpConfig) -> HyperpConfig:
 
 
 def mutate(config: HyperpConfig) -> HyperpConfig:
-    if random.random() < 0.05:
+    mutate_prob = 0.1
+    if random.random() < mutate_prob:
 
         # mutate hidden_layer_sizes
         num_layers = len(config.hidden_layer_sizes)
@@ -99,30 +101,30 @@ def mutate(config: HyperpConfig) -> HyperpConfig:
 
         # mutate each layer
         for i in range(num_layers):
-            if random.random() < 0.05:
+            if random.random() < mutate_prob:
                 config.hidden_layer_sizes[i] += random.choice([-1, 1])
                 if config.hidden_layer_sizes[i] < 1:
                     config.hidden_layer_sizes[i] = 1
 
-    if random.random() < 0.05:
+    if random.random() < mutate_prob:
         # mutate activation
         config.activation = random.choice(list(Activation))
 
-    if random.random() < 0.05:
+    if random.random() < mutate_prob:
         # mutate solver
         config.solver = random.choice(list(Solver))
 
-    if random.random() < 0.05:
+    if random.random() < mutate_prob:
         # mutate alpha
         config.alpha += random.choice([-0.00001, 0.00001])
         if config.alpha < 0:
             config.alpha = 0
 
-    if random.random() < 0.05:
+    if random.random() < mutate_prob:
         # mutate learning_rate
         config.learning_rate = random.choice(list(LearningRate))
 
-    if random.random() < 0.05:
+    if random.random() < mutate_prob:
         # mutate max_iter
         config.max_iter += random.choice([-50, 50])
 
@@ -148,7 +150,7 @@ def evolutionary_optimization(X, Y, preprocessor, pool_size: int):
     # --- Loop ---
     best_mean_prev: float = 0
     start_time = time.time()
-    max_time = 60 * 60 + 5  # max time in seconds (65 min)
+    max_time = 60 * 30 + 5  # max time in seconds (35 min)
     # key: iteration, value: (Config, mean)
     performance_dict: Dict[int, (float, HyperpConfig, float)] = {}
     p_d_i = 0
@@ -160,12 +162,14 @@ def evolutionary_optimization(X, Y, preprocessor, pool_size: int):
                 ('mlpc', mlp)
             ])
 
-            scores = cross_val_score(pipe, X, Y, cv=5, scoring="f1_macro")
+            x_train, x_test, y_train, y_test = train_test_split(X, Y, test_size=0.3, random_state=1)
+            pipe.fit(x_train, y_train)
+            y_pred = pipe.predict(x_test)
+            f1 = f1_score(y_test, y_pred, average="macro")
             # Sometimes two configurations have the same mean
             #   -> They differ by something that does not matter
             #   -> Since we use a dict we only keep one MLP with the same value
-            mean = scores.mean()
-            mean_score_dict[mean] = (hyper_p_config, mlp)
+            mean_score_dict[f1] = (hyper_p_config, mlp)
 
         # 3. Rank the hyperparameter tuples by their relative fitness
         mean_score_sorted_dict = dict(sorted(mean_score_dict.items()))
@@ -223,11 +227,11 @@ def evolutionary_optimization(X, Y, preprocessor, pool_size: int):
             print("After", elapsed_time, "seconds after iteration ", p_d_i, ", we get a mean of:", mean,
                   " with the hyperparameter config:\n", h_p_conf)
             print_10 = False
-        if elapsed_time > 30*60 and print_30:
+        if elapsed_time > 20*60 and print_30:
             print("After", elapsed_time, "seconds after iteration ", p_d_i, ", we get a mean of:", mean,
                   " with the hyperparameter config:\n", h_p_conf)
             print_30 = False
-        if elapsed_time > 60*60 and print_60:
+        if elapsed_time > 30*60 and print_60:
             print("After", elapsed_time, "seconds after iteration ", p_d_i, ", we get a mean of:", mean,
                   " with the hyperparameter config:\n", h_p_conf)
             print_60 = False
@@ -236,12 +240,22 @@ def evolutionary_optimization(X, Y, preprocessor, pool_size: int):
 
 
 if __name__ == "__main__":
-    X, Y, bc_preprocessor = satimages_preprocessing()
-    performance_dict = evolutionary_optimization(X, Y, bc_preprocessor, 10)
+    X, Y, preprocessor = satimages_preprocessing()
+    performance_dict = evolutionary_optimization(X, Y, preprocessor, 20)
     n_iterations, best_config = list(performance_dict.items())[-1]
-    print(f"After {best_config[0]} seconds in the {n_iterations}. iteration, we get a mean of {best_config[2]}"
+
+    mlp = best_config[1].create_initialized_mlp()
+    pipe = Pipeline(steps=[
+        ('pre', preprocessor),
+        ('mlpc', mlp)
+    ])
+    scores = cross_val_score(pipe, X, Y, cv=5)
+
+    print(f"After {best_config[0]} seconds in the {n_iterations}. iteration, we get a f1 of {best_config[2]}"
           f" with the following hyperparameter config:\n", best_config[1])
     #print(performance_dict)
+
+    print(f"We get a crossvalidation f1 mean score of:", scores.mean())
 
     plt.plot(list(performance_dict.keys()),
              [v[2] for v in performance_dict.values()],
@@ -249,5 +263,5 @@ if __name__ == "__main__":
     plt.title('Learning curve of the algorithm')
     plt.xlabel('Iterations')
     plt.ylabel('Performance')
-    plt.savefig('Learning_Curve_Satimage.png')
+    plt.savefig('Learning_Curve_Satimage_v2.png')
 
