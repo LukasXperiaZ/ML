@@ -202,7 +202,7 @@ def evolutionary_optimization(X, Y, preprocessor, pool_size: int):
         performance_dict[p_d_i] = (round(time.time() - start_time, 2), h_p_conf, round(best_mean, 2))
         p_d_i += 1
 
-        if best_mean > 0.98 or (best_mean - best_mean_prev < 0.001 and best_mean != best_mean_prev) :
+        if best_mean > 0.98 or (best_mean - best_mean_prev < 0.001 and best_mean != best_mean_prev):
             # finished
             #h_p_conf, b_mlp = final_sorted_mean_dict[best_mean]
             #return h_p_conf, b_mlp, best_mean
@@ -214,26 +214,30 @@ def evolutionary_optimization(X, Y, preprocessor, pool_size: int):
     #h_conf, mlp_ = mean_score_dict[best_mean_prev]
     #return h_conf, mlp_, best_mean_prev
 
+    print_10 = True
+    print_30 = True
+    print_60 = True
     for p_d_i in performance_dict.keys():
         elapsed_time, h_p_conf, mean = performance_dict[p_d_i]
-        if elapsed_time > 10*60:
-            print("After", elapsed_time, "minutes after iteration ", p_d_i, ", we get a mean of:", mean,
+        if elapsed_time > 10*60 and print_10:
+            print("After", elapsed_time, "seconds after iteration ", p_d_i, ", we get a mean of:", mean,
                   " with the hyperparameter config:\n", h_p_conf)
-        if elapsed_time > 30*60:
-            print("After", elapsed_time, "minutes after iteration ", p_d_i, ", we get a mean of:", mean,
+            print_10 = False
+        if elapsed_time > 30*60 and print_30:
+            print("After", elapsed_time, "seconds after iteration ", p_d_i, ", we get a mean of:", mean,
                   " with the hyperparameter config:\n", h_p_conf)
-        if elapsed_time > 60*60:
-            print("After", elapsed_time, "minutes after iteration ", p_d_i, ", we get a mean of:", mean,
+            print_30 = False
+        if elapsed_time > 60*60 and print_60:
+            print("After", elapsed_time, "seconds after iteration ", p_d_i, ", we get a mean of:", mean,
                   " with the hyperparameter config:\n", h_p_conf)
+            print_60 = False
 
     return performance_dict
 
 
-
-
 if __name__ == "__main__":
-    bc_X, bc_Y, bc_preprocessor = breast_cancer_preprocessing()
-    performance_dict = evolutionary_optimization(bc_X, bc_Y, bc_preprocessor, 10)
+    X, Y, bc_preprocessor = satimages_preprocessing()
+    performance_dict = evolutionary_optimization(X, Y, bc_preprocessor, 10)
     n_iterations, best_config = list(performance_dict.items())[-1]
     print(f"After {best_config[0]} seconds in the {n_iterations}. iteration, we get a mean of {best_config[2]}"
           f" with the following hyperparameter config:\n", best_config[1])
@@ -245,5 +249,5 @@ if __name__ == "__main__":
     plt.title('Learning curve of the algorithm')
     plt.xlabel('Iterations')
     plt.ylabel('Performance')
-    plt.savefig('Learning_Curve.png')
+    plt.savefig('Learning_Curve_Satimage.png')
 
