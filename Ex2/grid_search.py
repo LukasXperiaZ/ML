@@ -22,6 +22,7 @@ class GridSearchMLP:
                 for activation in self.params["activation"]:
                     for solver in self.params["solver"]:
                         for alpha in self.params["alpha"]:
+                            print(f"Trying parameters: {hidden_layer_sizes}, {activation}, {solver}, {alpha}")
                             preprocessor = ColumnTransformer(
                                 transformers=[
                                     ("scaler", StandardScaler(), X.select_dtypes(exclude="object").columns),
@@ -36,7 +37,7 @@ class GridSearchMLP:
                                 ('pre', preprocessor),
                                 ('mlpc', mlp)
                             ])
-                            scores = cross_val_score(pipe, X, y, cv=5, scoring="accuracy")
+                            scores = cross_val_score(pipe, X, y, cv=5, scoring="f1_macro")
                             if scores.mean() > self.best_score:
                                 self.best_score = scores.mean()
                                 self.best_params = {
