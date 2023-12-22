@@ -14,8 +14,8 @@ def main():
     X_train, X_test, y_train, y_test = train_test_split(X, y, test_size=0.3, random_state=1337)
 
     params = {
-        "nr_hidden_layers": list(range(1, 6)),
-        "nr_neurons": [1, 2, 3, 4, 5, 10],
+        "nr_hidden_layers": list(range(1, 4)),
+        "nr_neurons": [1, 3, 5, 10],
         "activation": ["tanh", "relu", "logistic", "identity"],
         "solver": ["adam", "lbfgs", "sgd"],
         "alpha": [0.00001, 0.0001, 0.001]
