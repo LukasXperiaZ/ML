@@ -1,3 +1,5 @@
+import time
+
 import pandas as pd
 from sklearn.neural_network import MLPClassifier
 from sklearn.model_selection import cross_val_score
@@ -41,14 +43,23 @@ def perform_cross_validation(X, y):
     return scores
 
 #Cross Validation
+start_sat = time.time()
 scores_sat = perform_cross_validation(X_sat, y_sat)
+end_sat = time.time()
+start_breast = time.time()
 scores_breast = perform_cross_validation(X_breast, y_breast)
+end_breast = time.time()
+start_loan = time.time()
 scores_loan = perform_cross_validation(X_loan, y_loan)
+end_loan = time.time()
 
 #Print Results
 print("Satimage")
 print(scores_sat.mean())
+print(end_sat - start_sat)
 print("Breast Cancer")
 print(scores_breast.mean())
+print(end_breast - start_breast)
 print("Loan")
 print(scores_loan.mean())
+print(end_loan - start_loan)
