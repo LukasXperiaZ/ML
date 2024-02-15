@@ -11,3 +11,7 @@ How to setup the poetry environment
 How to add a package
 ---
 * Run ``poetry add <package>``
+
+How to run a script in poetry
+---
+* Run ``poetry run python3 <script.py>``
