@@ -26,3 +26,15 @@ First navigate to the directory ``Ex3``
 
 * How to downscale an image separately: 
   * E.g. ``poetry run python3 src/ex3/downscale_image.py --image-file "SRCNN-pytorch-master/data/butterfly_GT.bmp" --scale 4``
+
+NOTE
+===
+Currently, the way they do it is the following:
+1. Downscale to a factor
+2. Upscale "naive" to the original size of the image
+   * I.e. just upscale the low res image to highres but keeping the "blur" so to say.
+3. Upscale the so to say blurred actual resolution picture with the CNN.
+
+
+Currently, they save the naive upscaled version of the picture. I think we should change that to the downscaled one.
+As this would make much more sense.
