@@ -15,3 +15,14 @@ How to add a package
 How to run a script in poetry
 ---
 * Run ``poetry run python3 <script.py>``
+
+Example calls:
+---
+First navigate to the directory ``Ex3``
+* Test with a pretrained model:
+  * The test.py script first blurs the image and then uses the CNN to unblurr it. Finally, it computes the PSNR score.
+  * ``poetry run python3 SRCNN-pytorch-master/test.py --weights-file "SRCNN-pytorch-master/pretrained/srcnn_x4.pth" --image-file "SRCNN-pytorch-master/data/butterfly_GT.bmp" --scale 4``
+
+
+* How to blur an image separately: 
+  * E.g. ``poetry run python3 src/ex3/blur_image.py --image-file "SRCNN-pytorch-master/data/butterfly_GT.bmp" --scale 4``
