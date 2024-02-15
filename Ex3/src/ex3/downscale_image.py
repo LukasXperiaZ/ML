@@ -14,5 +14,5 @@ if __name__ == '__main__':
     image = image.resize((image_width, image_height), resample=pil_image.BICUBIC)
     image = image.resize((image.width // args.scale, image.height // args.scale), resample=pil_image.BICUBIC)
     image = image.resize((image.width * args.scale, image.height * args.scale), resample=pil_image.BICUBIC)
-    image.save(args.image_file.replace('.', '_blurred_bicubic_x{}.'.format(args.scale)))
+    image.save(args.image_file.replace('.', '_downscaled_bicubic_x{}.'.format(args.scale)))
     print('Saved image to: {}'.format(args.image_file))

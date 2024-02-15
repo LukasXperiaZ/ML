@@ -25,4 +25,4 @@ First navigate to the directory ``Ex3``
 
 
 * How to blur an image separately: 
-  * E.g. ``poetry run python3 src/ex3/blur_image.py --image-file "SRCNN-pytorch-master/data/butterfly_GT.bmp" --scale 4``
+  * E.g. ``poetry run python3 src/ex3/downscale_image.py --image-file "SRCNN-pytorch-master/data/butterfly_GT.bmp" --scale 4``
