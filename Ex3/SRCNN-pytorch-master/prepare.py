@@ -7,6 +7,7 @@ from utils import convert_rgb_to_y
 
 
 def train(args):
+    # Creates a high resolution (hr) and low resolution (lr) h5 file of an image.
     h5_file = h5py.File(args.output_path, 'w')
 
     lr_patches = []
@@ -39,6 +40,7 @@ def train(args):
 
 
 def eval(args):
+    # Takes a h5 file and does TODO
     h5_file = h5py.File(args.output_path, 'w')
 
     lr_group = h5_file.create_group('lr')
