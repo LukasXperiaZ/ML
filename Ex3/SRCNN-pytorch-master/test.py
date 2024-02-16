@@ -35,9 +35,13 @@ if __name__ == '__main__':
     image_width = (image.width // args.scale) * args.scale
     image_height = (image.height // args.scale) * args.scale
     image = image.resize((image_width, image_height), resample=pil_image.BICUBIC)
+
+    # Now the image is made smaller
     image = image.resize((image.width // args.scale, image.height // args.scale), resample=pil_image.BICUBIC)
-    image = image.resize((image.width * args.scale, image.height * args.scale), resample=pil_image.BICUBIC)
     image.save(args.image_file.replace('.', '_bicubic_x{}.'.format(args.scale)))
+
+    # The image is scaled up again to the original size (but just naively, i.e. information is still lost)
+    image = image.resize((image.width * args.scale, image.height * args.scale), resample=pil_image.BICUBIC)
 
     image = np.array(image).astype(np.float32)
     ycbcr = convert_rgb_to_ycbcr(image)

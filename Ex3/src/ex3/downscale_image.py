@@ -12,7 +12,8 @@ if __name__ == '__main__':
     image_width = (image.width // args.scale) * args.scale
     image_height = (image.height // args.scale) * args.scale
     image = image.resize((image_width, image_height), resample=pil_image.BICUBIC)
+
+    # Now the image is made smaller
     image = image.resize((image.width // args.scale, image.height // args.scale), resample=pil_image.BICUBIC)
-    image = image.resize((image.width * args.scale, image.height * args.scale), resample=pil_image.BICUBIC)
     image.save(args.image_file.replace('.', '_downscaled_bicubic_x{}.'.format(args.scale)))
     print('Saved image to: {}'.format(args.image_file))
