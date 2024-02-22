@@ -25,6 +25,7 @@ if __name__ == '__main__':
     parser.add_argument('--num-epochs', type=int, default=400)
     parser.add_argument('--num-workers', type=int, default=8)
     parser.add_argument('--seed', type=int, default=123)
+    parser.add_argument('--weights-file', type=str, required=False)
     args = parser.parse_args()
 
     args.outputs_dir = os.path.join(args.outputs_dir, 'x{}'.format(args.scale))
@@ -34,10 +35,21 @@ if __name__ == '__main__':
 
     cudnn.benchmark = True
     device = torch.device('cuda:0' if torch.cuda.is_available() else 'cpu')
+    # device = torch.device('mps' if torch.backends.mps.is_available() else 'cpu')
+    print('Using device:', device)
+
 
     torch.manual_seed(args.seed)
 
     model = SRCNN().to(device)
+    if args.weights_file is not None:
+        state_dict = model.state_dict()
+        for n, p in torch.load(args.weights_file, map_location=lambda storage, loc: storage).items():
+            if n in state_dict.keys():
+                state_dict[n].copy_(p)
+            else:
+                raise KeyError(n)
+
     criterion = nn.MSELoss()
     optimizer = optim.Adam([
         {'params': model.conv1.parameters()},
