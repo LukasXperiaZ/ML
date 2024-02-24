@@ -40,7 +40,6 @@ def train(args):
 
 
 def eval(args):
-    # Takes a h5 file and does TODO
     h5_file = h5py.File(args.output_path, 'w')
 
     lr_group = h5_file.create_group('lr')
