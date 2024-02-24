@@ -35,7 +35,13 @@ Example: `` poetry run python3 SRCNN-pytorch-master/prepare.py --images-dir trai
 
 How to learn
 ---
-Example: ````
+Usage: ``poetry run python3 SRCNN-pytorch-master/train.py --train-file <train-file.h5> --eval-file <eval-file.h5> --outputs-dir <output-dir> --scale <scale> --num-epochs <number> --num-workers <number> --weights-file <weights.pth>``
+Example: ``poetry run python3 SRCNN-pytorch-master/train.py --train-file train2014_2k.h5 --eval-file eval/Set5_x3.h5 --outputs-dir outputs/2k_dataset/ --scale 3 --num-epochs 10 --num-workers 16 --weights-file SRCNN-pytorch-master/pretrained/srcnn_x3.pth``
+
+
+How to evaluate
+---
+Example ``poetry run python3 SRCNN-pytorch-master/test_validation_set.py --weights-file outputs/x3/2k_dataset/epoch_4\(BEST\).pth --eval-file eval/Set5_x3.h5``
 
 
 NOTE
