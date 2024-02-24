@@ -27,6 +27,17 @@ First navigate to the directory ``Ex3``
 * How to downscale an image separately:
   * E.g. ``poetry run python3 src/ex3/downscale_image.py --image-file "SRCNN-pytorch-master/data/butterfly_GT.bmp" --scale 4``
 
+
+How to prepare
+---
+Example: `` poetry run python3 SRCNN-pytorch-master/prepare.py --images-dir train2014_2k/ --output-path train2014_2k.h5 --scale 3``
+
+
+How to learn
+---
+Example: ````
+
+
 NOTE
 ===
 The way it is done is the following:
