@@ -1,4 +1,4 @@
-How to setup the poetry environment
+How to set up the poetry environment
 ===
 
 1. install python 3 (3.10.8)
